@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.log4j.Logger;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -14,6 +15,8 @@ import com.rbs.service.model.ErrorResponse;
 @ControllerAdvice
 public class RbsExceptionHandler {
 
+	private static final Logger LOGGER = Logger.getLogger(RbsExceptionHandler.class);
+
 	/**
 	 * @param exception
 	 * @return
@@ -23,7 +26,14 @@ public class RbsExceptionHandler {
 		ErrorResponse response = new ErrorResponse();
 		response.setCode(1000);
 		response.setMessage(exception.getMessage());
-		response.setFullStackTrace(getStackTrace(exception, false));
+		if(LOGGER.isDebugEnabled()){
+			response.setTrace(getStackTrace(exception, false));
+			response.setFullStackTrace(getStackTrace(exception, true));
+			LOGGER.debug(getStackTrace(exception, true));
+		}if(LOGGER.isInfoEnabled()){
+			response.setTrace(getStackTrace(exception, false));
+			LOGGER.info(getStackTrace(exception, false));
+		}
 		return response;
 
 	}
@@ -33,11 +43,18 @@ public class RbsExceptionHandler {
 	 * @return
 	 */
 	@ExceptionHandler(value = RbsException.class)
-	public @ResponseBody ErrorResponse handleRbsException(RbsException rbsException){
+	public @ResponseBody ErrorResponse handleRbsException(RbsException exception){
 		ErrorResponse response = new ErrorResponse();
 		response.setCode(1001);
-		response.setMessage(rbsException.getMessage());
-		response.setTrace(getStackTrace(rbsException, false));
+		response.setMessage(exception.getMessage());
+		if(LOGGER.isDebugEnabled()){
+			response.setTrace(getStackTrace(exception, false));
+			response.setFullStackTrace(getStackTrace(exception, true));
+			LOGGER.debug(getStackTrace(exception, true));
+		}if(LOGGER.isInfoEnabled()){
+			response.setTrace(getStackTrace(exception, false));
+			LOGGER.info(getStackTrace(exception, false));
+		}
 		return response;
 
 	}
